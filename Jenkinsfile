@@ -15,9 +15,10 @@ pipeline {
             steps {
                 // Build the Docker image using the Dockerfile from the repository
                 script {
-                    def dockerImage = docker.build("my_web_app_image:${env.BUILD_ID}", "-f Dockerfile .")
+                    sh "sudo docker image build -t devops:${env.BUILD_ID} -f Dockerfile ."
                     // Save the dockerImage variable as an environment variable for later use
                     env.IMAGE_NAME = "devops:${env.BUILD_ID}"
+		    sh "echo ${env.BUILD_ID}"
                 }
             }
         }
@@ -33,15 +34,15 @@ pipeline {
             steps {
                 // Tag the Docker image with Docker Hub repository name
                 script {
-                    sh "docker tag ${env.IMAGE_NAME} ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:${env.BUILD_ID}"
-                    sh "docker tag ${env.IMAGE_NAME} ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:latest"
+                    sh "sudo docker tag ${env.IMAGE_NAME} ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:${env.BUILD_ID}"
+                    sh "sudo docker tag ${env.IMAGE_NAME} ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:latest"
                 }
                 // Log in to Docker Hub
-                sh "docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}"
+                sh "sudo docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}"
 
                 // Push the Docker image to Docker Hub
-                sh "docker push ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:${env.BUILD_ID}"
-                sh "docker push ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:latest"
+                sh "sudo docker push ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:${env.BUILD_ID}"
+                sh "sudo docker push ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPOSITORY}:latest"
             }
         }
 
@@ -49,7 +50,7 @@ pipeline {
             steps {
                 // Run the Docker container from the built image with port 8000 mapped to the host
                 script {
-                    sh "docker run -p 8000:80 -d --name my_web_app_container ${env.IMAGE_NAME}"
+                    sh "sudo docker run -p 8000:80 -d --name my_web_app_container ${env.IMAGE_NAME}"
                 }
             }
         }

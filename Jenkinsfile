@@ -50,7 +50,7 @@ pipeline {
             steps {
                 // Run the Docker container from the built image with port 8000 mapped to the host
                 script {
-                    sh "docker run -p 8000:80 -d --name my_web_app_container ${env.IMAGE_NAME}"
+                    sh "docker run -p 8000:80 -d --name my_web_app_container --rm ${env.IMAGE_NAME}"
                 }
             }
         }
